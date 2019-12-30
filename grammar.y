@@ -17,16 +17,18 @@
 %%
 
 programa:
-    instrucao    { /*existsCommand() ? printf("EXECUTA") : 0;*/}
-    |   TERMINA EOL   { strcmp($1,"termina") == 0 ? exit(0) : 0; }
+        instrucao EOL   { /*existsCommand() ? printf("EXECUTA") : 0;*/}
+    |   close EOL { exit(0) : 0; }
     ;
+close:
+        TERMINA { $$ = strcmp($1,"termina") == 0 ? 1 : 0; }
 
 instrucao:
-    COMMAND SPACE params EOL    { printf("\nCOMMAND: %s", COMMAND);/*insertCommand($1);*/ }
+        COMMAND SPACE params    { printf("\nCOMMAND: %s", COMMAND);/*insertCommand($1);*/ }
     ;
 
 params:
-    PARAM SPACE PARAM  { printf("\nPARAM: %s \nPARAM2: %s", $1,$3);/*insertParam($1);*/ }
+        SPACE PARAM  { printf("\nPARAM: %s", $1);/*insertParam($1);*/ }
     |   PARAM   { printf("\nPARAM: %s", PARAM);/*insertParam($1);*/ }
     ;
 %%

@@ -14,7 +14,6 @@ typedef struct _instrucao{
     int count;
 }instrucao;
 //VARS de funcionamento
-
 //char *path = "/bin/"; //Funciona com comandos do sistema operativo
 
 //Funcoes
