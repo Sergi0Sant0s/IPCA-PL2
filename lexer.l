@@ -6,16 +6,18 @@
 %}
 
 /*
-{VARNAME}    { yylval.str = strdup(yytext+1); return VAR_NAME; }
-{VARVALUE}     { yylval.str = strdup(yytext+1); return VAR_VALUE; }
 
-VARNAME $"[a-z]+
-VARVALUE :[a-z]+
+
+
 */
 
 COMMANDO ^[a-zA-Z0-9]+
 TERMINA ^[a-zA-Z]+\n
 PARAMETRO [^ \n]+
+
+VARNAME $[a-zA-Z0-9]+
+VARVALUE =[ ]*[^ \n]+
+
 EOL \n
 SPACES [ ]+
 
@@ -23,10 +25,14 @@ SPACES [ ]+
 
 %%
 
+{VARNAME}    { yylval.string = strdup(yytext+1); return VARNAME; }
+{VARVALUE}     { yylval.string = strdup(yytext+2); return VARVALUE; }
+
 {COMMANDO}  {yylval.string = strdup(yytext); return COMMAND;}
 {PARAMETRO} {yylval.string = strdup(yytext); return PARAM;}
 
 {SPACES} { /* IGNORA ESPACOS */ }
+
 
 {EOL}   {return EOL;}
 {TERMINA}   { yylval.string = strdup(yytext); yylval.string[strlen(yylval.string) - 1] = '\0'; return TERMINA; }

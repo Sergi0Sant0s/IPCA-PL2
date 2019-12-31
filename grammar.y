@@ -3,8 +3,9 @@
     #include <stdlib.h>
     #include "funcoes.h"
 
-    char array[100][100];
-    int count = 0;
+    Var *lst = (Var*) malloc(sizeof(Var));
+    lst->next = NULL;
+    last = &lst;
 %}
 
 %union{
@@ -12,25 +13,35 @@
     struct _parametro *param;
 }
 
-%token COMMAND TERMINA PARAM EOL
-%left COMMAND PARAM
+%token COMMAND TERMINA PARAM VARNAME VARVALUE EOL
+%left COMMAND PARAM VARNAME VARVALUE
 
-%type<string> COMMAND PARAM TERMINA
+%type<string> COMMAND PARAM VARNAME VARVALUE TERMINA
 %type<param> paramList
 
 %%
 
 s:
-        COMMAND paramList EOL   { printf("\nCOMMAND: _%s_",$1); Lista($2); }
-    |   TERMINA                 { checkExit($1); }
+        COMMAND paramList EOL   {   if(existsCommand($1)) 
+                                        if(instrucao($1,$2)) printf("Terminou o comando %s\n", $1);
+                                        else printf("Nao foi possivel executar o comando %s\n.", $1);
+                                    else    printf("O comando %s não existe\n",$1); 
+                                    return 0;
+                            }
+    |   VARNAME VARVALUE EOL    {   newVariable(last,$1,$2); }
+    |   TERMINA                 {   checkExit($1); return 0;}
     ;
 
 paramList:
-        PARAM                   { $$ = newParametro($1); }
-    |   PARAM paramList         { $$ = insertParametro($2,newParametro($1)); }
-
+        PARAM paramList         {   $$ = insertParametro($2,newParametro($1)); }
+    |   PARAM                   {   $$ = newParametro($1); }
+    |   VARNAME                 { 
+                                    Var *aux = returnVariable(lst,$1);
+                                    lst != NULL ? $$ = newParametro(aux->value)
+                                    : (printf("A variavel %s nao existe.\n",$1), return 0); 
+                                }
 %%
 
 void yyerror(char *c){
-    printf("Meu erro foi: %s\n", c);
+    printf("\nErro: %s\n", c);
 }

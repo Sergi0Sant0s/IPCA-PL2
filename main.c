@@ -3,8 +3,11 @@
 
 
 int main() {
-    printf("\n%% ");
-    yyparse();
+    do{
+        printf("%% ");
+        yyparse();
+    }while(1);
+    
     return 0;
 }
 
