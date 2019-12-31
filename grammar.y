@@ -1,34 +1,34 @@
 %{
+    #include <stdio.h>
+    #include <stdlib.h>
     #include "funcoes.h"
 
-    newInstrucao();
+    char array[100][100];
+    int count = 0;
 %}
 
-%token COMMAND TERMINA SPACE PARAM EOL
-%left COMMAND TERMINA
-
-%type <string> COMMAND
-%type <string> TERMINA
-%type <string> PARAM
-
 %union{
-    char string[100];
+    char *string;
+    struct _parametro *param;
 }
+
+%token COMMAND TERMINA PARAM EOL
+%left COMMAND PARAM
+
+%type<string> COMMAND PARAM TERMINA
+%type<param> paramList
+
 %%
 
-programa:
-    instrucao    { /*existsCommand() ? printf("EXECUTA") : 0;*/}
-    |   TERMINA EOL   { strcmp($1,"termina") == 0 ? exit(0) : 0; }
+s:
+        COMMAND paramList EOL   { printf("\nCOMMAND: _%s_",$1); Lista($2); }
+    |   TERMINA                 { checkExit($1); }
     ;
 
-instrucao:
-    COMMAND SPACE params EOL    { printf("\nCOMMAND: %s", COMMAND);/*insertCommand($1);*/ }
-    ;
+paramList:
+        PARAM                   { $$ = newParametro($1); }
+    |   PARAM paramList         { $$ = insertParametro($2,newParametro($1)); }
 
-params:
-    PARAM SPACE PARAM  { printf("\nPARAM: %s \nPARAM2: %s", $1,$3);/*insertParam($1);*/ }
-    |   PARAM   { printf("\nPARAM: %s", PARAM);/*insertParam($1);*/ }
-    ;
 %%
 
 void yyerror(char *c){

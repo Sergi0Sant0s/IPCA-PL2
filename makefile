@@ -7,11 +7,11 @@ lex.yy.c: lexer.l
 grammar.tab.c grammar.tab.h: grammar.y
 	bison -d grammar.y
 
-grammar.tab.o: grammar.tab.c
+grammar.tab.o: grammar.tab.c funcoes.h
 
-lex.yy.o: lex.yy.c grammar.tab.h
+lex.yy.o: lex.yy.c grammar.tab.h funcoes.h
 
-main.o: main.c grammar.tab.h
+main.o: main.c grammar.tab.h funcoes.h
 
 funcoes.o: funcoes.c funcoes.h grammar.tab.h 
 
