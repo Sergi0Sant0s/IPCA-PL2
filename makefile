@@ -16,6 +16,7 @@ main.o: main.c grammar.tab.h funcoes.h
 funcoes.o: funcoes.c funcoes.h grammar.tab.h 
 
 clean:
+	@rm -rf interpetador
 	@rm -rf *.o
 	@rm -rf grammar.tab.h
 	@rm -rf grammar.tab.c
