@@ -2,46 +2,65 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "funcoes.h"
-
-    Var *lst = (Var*) malloc(sizeof(Var));
-    lst->next = NULL;
-    last = &lst;
 %}
 
 %union{
     char *string;
-    struct _parametro *param;
+    struct _text *text;
+    struct _ciclo *ciclo;
+    struct _command *command;
+    struct _instrucao *instrucao;
+    struct _var *variavel;
 }
 
-%token COMMAND TERMINA PARAM VARNAME VARVALUE EOL
-%left COMMAND PARAM VARNAME VARVALUE
+%token COMMAND TEXT SPACE VARNAME VARVALUE ASPA PARACADA DAPASTA FIMPARA EOL TERMINA
 
-%type<string> COMMAND PARAM VARNAME VARVALUE TERMINA
-%type<param> paramList
+
+%type<string> COMMAND TEXT SPACE VARNAME VARVALUE
+%type<text> textList
+%type<ciclo> ciclo
+%type<instrucao> instrucao
+%type<command> command
+%type<variavel> variavel
 
 %%
 
 s:
-        COMMAND paramList EOL   {   if(existsCommand($1)) 
-                                        if(instrucao($1,$2)) printf("Terminou o comando %s\n", $1);
-                                        else printf("Nao foi possivel executar o comando %s\n.", $1);
-                                    else    printf("O comando %s não existe\n",$1); 
-                                    return 0;
-                            }
-    |   VARNAME VARVALUE EOL    {   newVariable(last,$1,$2); }
-    |   TERMINA                 {   checkExit($1); return 0;}
+        variavel                    {   if($1 != NULL) printf("Variavel: %s | Valor: %s\n",$1->name,$1->value); return 0;}
+    |   ciclo                       {   teste($1); return 0; }   
+    |   command                     {   printf("result command: %s\n",$1->command); /*execute($1);*/ return 0;}
     ;
 
-paramList:
-        PARAM paramList         {   $$ = insertParametro($2,newParametro($1)); }
-    |   PARAM                   {   $$ = newParametro($1); }
-    |   VARNAME                 { 
-                                    Var *aux = returnVariable(lst,$1);
-                                    lst != NULL ? $$ = newParametro(aux->value)
-                                    : (printf("A variavel %s nao existe.\n",$1), return 0); 
-                                }
+variavel:
+        VARNAME SPACE VARVALUE EOL  {  $$ = returnValue($1) == NULL ? newVariable($1,$3) : editVariable($1,$3); }
+    |   VARNAME EOL                 {  $$ = returnValue($1); }
+    ;
+
+command:
+        COMMAND ASPA textList ASPA EOL  { $$ = newCommand($1,$3); }
+    |   COMMAND textList EOL            { $$ = newCommand($1,$2); }
+    |   TERMINA                         { termina(); }
+    ;
+
+textList:
+        TEXT textList               { $$ = insertText($2,newText($1, TXT)); }
+    |   VARNAME textList            { $$ = insertText($2,newText($1, VAR)); }
+    |   TEXT                        { $$ = newText($1, TXT); }
+    |   SPACE                       { $$ = newText($1, TXT); }
+    |   VARNAME                     { $$ = newText($1, VAR); }
+    ;
+
+instrucao:
+        command instrucao           { $$ = insertInstrucao($2,newInstrucao($1,CMD)); }
+    |   ciclo instrucao             { $$ = insertInstrucao($2,newInstrucao($1,CICLO)); }
+    |   command                     { $$ = newInstrucao($1,CMD); }
+    |   ciclo                       { $$ = newInstrucao($1,CICLO);}
+    ;
+
+ciclo:
+        PARACADA VARNAME SPACE DAPASTA TEXT EOL instrucao FIMPARA  { $$ = newCiclo($2,$5,$7); }
+    ;
+
 %%
 
-void yyerror(char *c){
-    printf("\nErro: %s\n", c);
-}
+void yyerror(char *c){ printf("\nErro: %s",c);/* ... */}

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "grammar.tab.h"
+#include "funcoes.h"
 
 
 int main() {
     do{
-        printf("%% ");
+        printf("\n=================================================================\n");
         yyparse();
     }while(1);
     
