@@ -18,7 +18,7 @@ typedef struct _command{
 
 typedef struct _ciclo{
     char *varname;
-    char *folder;
+    Text *folder;
     struct _instrucao *list;
 }Ciclo;
 
@@ -37,13 +37,12 @@ typedef struct _instrucao{
 void yyerror(char *c);
 int yylex(void);
 
-
-
-void teste(Ciclo* temp);
-
 //EXEC
 int existsCommand(char *command);
-void execute(char *command, char *Text);
+Text* getContainerFolder(char* folder);
+void execute(char *command, char **array);
+int executaCommand(Command *aux);
+int commandAcrescenta(Command* aux);
 int executaInstrucao(Instrucao *inst);
 
 //Armazenamento de Texts
@@ -61,7 +60,8 @@ Var* returnValue(char *varname);
 Command* newCommand(char* command, Text* list);
 
 //CICLOS
-Ciclo* newCiclo(char* varname, char* folder, Instrucao *list);
+Ciclo* newCiclo(char* varname, Text* folder, Instrucao *list);
+void executaCiclo(Ciclo* temp);
 
 //Instrucao
 Instrucao* insertInstrucao(Instrucao *lst, Instrucao *last);

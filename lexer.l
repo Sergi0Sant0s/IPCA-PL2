@@ -5,7 +5,7 @@
 
 %}
 
-VARNAME $[a-zA-Z]+
+VARNAME $[a-zA-Z0-9]+
 VARVALUE =[ ][^ \n\t\r]+
 
 IGNORE [\t\r]
@@ -27,7 +27,7 @@ TERMINA ^termina\n
 {EOL}       { return EOL; }
 
 {COMMANDO}  { yylval.string = strdup(yytext); yylval.string[strlen(yylval.string)-1] = '\0'; return COMMAND; }
-{SPACE}     { return SPACE; }
+{SPACE}     { yylval.string = strdup(yytext); return SPACE; }
 {ASPA}      { return ASPA; }
 
 {VARNAME}   { yylval.string = strdup(yytext+1); return VARNAME; }

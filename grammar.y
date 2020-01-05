@@ -1,6 +1,7 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include <strings.h>
     #include "funcoes.h"
 %}
 
@@ -27,8 +28,9 @@
 
 s:
         variavel                    {   if($1 != NULL) printf("Variavel: %s | Valor: %s\n",$1->name,$1->value); return 0;}
-    |   ciclo                       {   teste($1); return 0; }   
-    |   command                     {   printf("result command: %s\n",$1->command); /*execute($1);*/ return 0;}
+    |   ciclo                       {   executaCiclo($1); return 0; }   
+    |   command                     {   executaCommand($1); return 0; }
+    |   EOL                         {   return 0; }
     ;
 
 variavel:
@@ -44,6 +46,7 @@ command:
 
 textList:
         TEXT textList               { $$ = insertText($2,newText($1, TXT)); }
+    |   SPACE textList              { $$ = insertText($2,newText($1, TXT)); }
     |   VARNAME textList            { $$ = insertText($2,newText($1, VAR)); }
     |   TEXT                        { $$ = newText($1, TXT); }
     |   SPACE                       { $$ = newText($1, TXT); }
@@ -58,9 +61,14 @@ instrucao:
     ;
 
 ciclo:
-        PARACADA VARNAME SPACE DAPASTA TEXT EOL instrucao FIMPARA  { $$ = newCiclo($2,$5,$7); }
+        PARACADA VARNAME SPACE DAPASTA textList EOL instrucao FIMPARA  { $$ = newCiclo($2,$5,$7); }
     ;
 
 %%
 
-void yyerror(char *c){ printf("\nErro: %s",c);/* ... */}
+void yyerror(char *c){ 
+    strcmp(c,"syntax error") == 0 ? printf("A gramática não foi detectada.\n")
+    :
+    printf("\nErro: %s\n",c);
+
+}
