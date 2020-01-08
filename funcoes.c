@@ -10,10 +10,6 @@
 #include "grammar.tab.h"
 #include "funcoes.h"
 
-//VARS de funcionamento
-//char *path = "/bin/"; //Funciona com comandos do sistema operativo
-char *closePrograma = "termina";
-
 Var *vList = NULL, *vLast;
 
 #pragma region Texts
@@ -43,38 +39,29 @@ void printTexts(Text *lst){
     printf("\n");
 }
 
-//Devolve o numero de Texts existentes
-int countText(Text *lst){
-    Text *aux = lst;
-    int count = 0;
-    while(aux != NULL){
-        count++;
-        aux = aux->child;
-    }
-    //
-    return count;
-}
-
 #pragma endregion
 
 #pragma region Variables
 
 Var* newVariable(char *name, char *value){
-    if(vList == NULL){
-        vList = (Var*) malloc(sizeof(Var));
-        vList->name = strdup(name);
-        vList->value = strdup(value);
-        vList->next = NULL;
-        vLast = vList;
+    if(returnValue(name) == NULL){
+        if(vList == NULL){
+            vList = (Var*) malloc(sizeof(Var));
+            vList->name = strdup(name);
+            vList->value = strdup(value);
+            vList->next = NULL;
+            vLast = vList;
+        }
+        else{
+            vLast->next = (Var*) malloc(sizeof(Var));
+            vLast = vLast->next;
+            vLast->name = strdup(name);
+            vLast->value = strdup(value);
+            vLast->next = NULL;
+        }    
+        return vLast;
     }
-    else{
-        vLast->next = (Var*) malloc(sizeof(Var));
-        vLast = vLast->next;
-        vLast->name = strdup(name);
-        vLast->value = strdup(value);
-        vLast->next = NULL;
-    }    
-    return vLast;
+    else return editVariable(name,value);
 }
 
 Var* editVariable(char *name, char *value){
@@ -126,9 +113,7 @@ Ciclo* newCiclo(char* varname, Text* folder, Instrucao *list){
 }
 
 void executaCiclo(Ciclo* temp){
-
     struct _instrucao *aux = NULL;
-    Var* first = vList == NULL ? vList : vLast->next;
     newVariable(temp->varname,"");
     char* filename;
 
@@ -141,6 +126,7 @@ void executaCiclo(Ciclo* temp){
             tempFolder = tempFolder->child; 
         }
     }
+
     Text* folderFiles = getContainerFolder(folder); //todos os ficheiros e pastas da pasta do ciclo
 
     while (folderFiles != NULL){ //Ciclo para cada ficheiro ou pasta da pasta deste ciclo
@@ -161,9 +147,6 @@ void executaCiclo(Ciclo* temp){
         }
         folderFiles = folderFiles->child; //Proximo ficheiro / pasta   
     }
-
-    if(first == vList) vList = NULL;
-    else vLast->next = NULL;
 }
 
 #pragma endregion

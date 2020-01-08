@@ -1,11 +1,11 @@
 all: clean main.o lex.yy.o grammar.tab.o funcoes.o exec.o
-	gcc -o interpetador main.o lex.yy.o grammar.tab.o funcoes.o exec.o -lm
+	@gcc -o interpetador main.o lex.yy.o grammar.tab.o funcoes.o exec.o -lm
 
 lex.yy.c: lexer.l
-	flex lexer.l
+	@flex lexer.l
 
 grammar.tab.c grammar.tab.h: grammar.y
-	bison -d grammar.y
+	@bison -d grammar.y
 
 grammar.tab.o: grammar.tab.c funcoes.h
 

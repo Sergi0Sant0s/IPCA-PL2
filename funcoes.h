@@ -49,7 +49,6 @@ int executaInstrucao(Instrucao *inst);
 Text* newText(char *string, int type);
 Text* insertText(Text *lst, Text *temp);
 void printTexts(Text *lst);
-int countText(Text *lst);
 
 //Variables
 Var* newVariable(char* name, char* value);

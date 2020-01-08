@@ -16,7 +16,6 @@
 
 %token COMMAND TEXT SPACE VARNAME VARVALUE ASPA PARACADA DAPASTA FIMPARA EOL TERMINA
 
-
 %type<string> COMMAND TEXT SPACE VARNAME VARVALUE
 %type<text> textList
 %type<ciclo> ciclo
@@ -27,7 +26,10 @@
 %%
 
 s:
-        variavel                    {   if($1 != NULL) printf("Variavel: %s | Valor: %s\n",$1->name,$1->value); return 0;}
+        variavel                    {   if($1 != NULL) printf("Variavel: %s | Valor: %s\n",$1->name,$1->value);
+                                        else printf("A variavel não existe.\n"); 
+                                        return 0;
+                                    }
     |   ciclo                       {   executaCiclo($1); return 0; }   
     |   command                     {   executaCommand($1); return 0; }
     |   EOL                         {   return 0; }
@@ -35,7 +37,7 @@ s:
 
 variavel:
         VARNAME SPACE VARVALUE EOL  {  $$ = returnValue($1) == NULL ? newVariable($1,$3) : editVariable($1,$3); }
-    |   VARNAME EOL                 {  $$ = returnValue($1); }
+    |   VARNAME EOL                 {  $$ = returnValue($1) != NULL ? returnValue($1) : NULL; }
     ;
 
 command:
@@ -67,8 +69,6 @@ ciclo:
 %%
 
 void yyerror(char *c){ 
-    strcmp(c,"syntax error") == 0 ? printf("A gramática não foi detectada.\n")
-    :
-    printf("\nErro: %s\n",c);
-
+    strcmp(c,"syntax error") == 0 ? 
+        printf("A gramática não foi detectada.\n") :  printf("\nErro: %s\n",c);
 }

@@ -13,6 +13,7 @@
 
 //Path default execs
 char *path = "./exec/";
+//char *path = "/bin/"; //Funciona com comandos do sistema operativo
 
 //Verifica se existe o comando
 //1 = encontrado
